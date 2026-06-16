@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-  <title>论文修改助手</title>
+  <title>万能对话工具</title>
   <style>
     * {
       margin: 0;
@@ -14,16 +14,16 @@
     body {
       font-family: 'Segoe UI', 'Noto Sans SC', system-ui, -apple-system, sans-serif;
       background: #f4f7fb;
-      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
+      min-height: 100vh;
       padding: 8px;
       touch-action: manipulation;
     }
     .container {
       width: 100%;
-      max-width: 600px;
+      max-width: 700px;
       height: 95vh;
       background: #fff;
       border-radius: 20px;
@@ -31,14 +31,34 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      position: relative;
     }
-    .config-bar {
-      padding: 12px 14px;
+
+    /* 配置折叠区 */
+    .config-toggle {
+      padding: 10px 14px;
+      background: #f0f4f3;
+      border-bottom: 1px solid #dcebe4;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #2b4b3a;
+      cursor: pointer;
+      user-select: none;
+    }
+    .config-panel {
       background: #f9fbfd;
       border-bottom: 1px solid #e9edf2;
-      display: flex;
+      padding: 12px 14px;
+      display: none;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
+      animation: fadeIn 0.2s;
+    }
+    .config-panel.open {
+      display: flex;
     }
     .config-row {
       display: flex;
@@ -56,74 +76,29 @@
       font-size: 0.65rem;
       font-weight: 600;
       color: #5e6f7d;
-      letter-spacing: 0.3px;
     }
-    .config-group input, .config-group select {
-      padding: 8px 10px;
+    .config-group input, .config-group select, .config-group textarea {
+      padding: 6px 8px;
       border: 1px solid #dce3ea;
       border-radius: 8px;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       background: #fff;
       width: 100%;
-    }
-    .model-row {
-      display: flex;
-      gap: 6px;
-      align-items: flex-end;
-    }
-    .model-row .config-group {
-      flex: 1;
-    }
-    .fetch-btn {
-      background: #2b7a62;
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 0.75rem;
-      white-space: nowrap;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .prompt-area {
-      padding: 10px 14px;
-      background: #f0f4f3;
-      border-bottom: 1px solid #dcebe4;
-    }
-    .prompt-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 5px;
-    }
-    .prompt-header span {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #2b4b3a;
-    }
-    .prompt-header button {
-      background: none;
-      border: 1px solid #b7cdc2;
-      color: #2b4b3a;
-      padding: 3px 12px;
-      border-radius: 20px;
-      font-size: 0.65rem;
-    }
-    textarea#systemPrompt {
-      width: 100%;
-      border: 1px solid #cbdcd3;
-      border-radius: 8px;
-      padding: 8px 10px;
-      font-size: 0.8rem;
-      background: #fff;
-      resize: vertical;
-      min-height: 55px;
-      max-height: 80px;
       font-family: inherit;
     }
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .slider-row input[type="range"] {
+      flex: 1;
+    }
+    .slider-row span {
+      font-size: 0.7rem;
+      min-width: 35px;
+    }
+
     .chat-box {
       flex: 1;
       overflow-y: auto;
@@ -137,6 +112,7 @@
       display: flex;
       gap: 6px;
       max-width: 90%;
+      position: relative;
     }
     .message.user {
       align-self: flex-end;
@@ -166,8 +142,36 @@
       line-height: 1.5;
       white-space: pre-wrap;
       word-break: break-word;
+      position: relative;
     }
     .message.user .bubble { background: #dff1eb; }
+
+    /* 消息操作按钮 */
+    .msg-actions {
+      display: flex;
+      gap: 4px;
+      margin-top: 4px;
+      opacity: 0.4;
+      transition: 0.2s;
+      justify-content: flex-end;
+    }
+    .message:hover .msg-actions { opacity: 1; }
+    .msg-btn {
+      background: rgba(0,0,0,0.05);
+      border: none;
+      border-radius: 12px;
+      padding: 2px 8px;
+      font-size: 0.65rem;
+      cursor: pointer;
+      color: #5e6f7d;
+    }
+    .msg-btn:active { background: rgba(0,0,0,0.1); }
+
+    .select-checkbox {
+      margin-right: 4px;
+      transform: scale(0.9);
+    }
+
     .input-row {
       padding: 10px 14px;
       border-top: 1px solid #e9edf2;
@@ -198,6 +202,7 @@
       white-space: nowrap;
     }
     #sendBtn:disabled { background: #b7cdc2; }
+
     .loading-dots { display: flex; gap: 4px; padding: 2px 0; }
     .loading-dots span {
       width: 5px; height: 5px;
@@ -211,55 +216,144 @@
       0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; }
       40% { transform: scale(1.2); opacity: 1; }
     }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 6px;
+      padding: 6px 14px;
+      background: #f9fbfd;
+      border-top: 1px solid #e9edf2;
+      flex-wrap: wrap;
+    }
+    .toolbar button {
+      background: none;
+      border: 1px solid #dce3ea;
+      padding: 4px 10px;
+      border-radius: 14px;
+      font-size: 0.7rem;
+      color: #5e6f7d;
+    }
+    .toolbar button:active { background: #eef2f6; }
+
     .status-bar {
       font-size: 0.65rem;
       color: #7c8b98;
-      padding: 6px 14px;
+      padding: 4px 14px;
       text-align: center;
+    }
+
+    .memory-section {
+      background: #f8f4e8;
+      padding: 8px 14px;
+      border-bottom: 1px solid #e2d9c0;
+      display: none;
+    }
+    .memory-section.active { display: block; }
+    .memory-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .memory-row textarea {
+      flex: 1;
+      height: 36px;
+      border: 1px solid #d0c7a5;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 0.7rem;
+      resize: none;
     }
   </style>
 </head>
 <body>
 <div class="container">
-  <div class="config-bar">
+  <!-- 配置折叠按钮 -->
+  <div class="config-toggle" id="configToggle">⚙️ 配置与参数 <span>▼</span></div>
+  
+  <!-- 配置面板 -->
+  <div class="config-panel" id="configPanel">
     <div class="config-row">
-      <div class="config-group">
+      <div class="config-group" style="flex:2">
         <label>🔗 API 地址</label>
-        <input type="text" id="apiBase" placeholder="https://api.openai.com/v1" value="https://api.openai.com/v1">
+        <input type="text" id="apiBase" value="https://bailan.sikong.chat/v1">
       </div>
-      <div class="config-group">
+      <div class="config-group" style="flex:2">
         <label>🔑 API 密钥</label>
         <input type="password" id="apiKey" placeholder="sk-...">
       </div>
     </div>
-    <div class="model-row">
-      <div class="config-group">
+    <div class="config-row">
+      <div class="config-group" style="flex:2">
         <label>🧠 模型</label>
-        <select id="modelSelect">
-          <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
-        </select>
+        <div style="display:flex; gap:4px;">
+          <select id="modelSelect" style="flex:1;"><option value="gpt-3.5-turbo">gpt-3.5-turbo</option></select>
+          <button id="fetchModelsBtn" style="padding:4px 10px; font-size:0.7rem;">📋拉取</button>
+        </div>
       </div>
-      <button class="fetch-btn" id="fetchModelsBtn">📋 拉取模型</button>
+    </div>
+    <div class="config-row">
+      <div class="slider-row" style="flex:1">
+        <label style="font-size:0.65rem;">🌡️温度</label>
+        <input type="range" id="temperature" min="0" max="2" step="0.1" value="0.7">
+        <span id="tempVal">0.7</span>
+      </div>
+      <div class="slider-row" style="flex:1">
+        <label style="font-size:0.65rem;">📊 Top-P</label>
+        <input type="range" id="topP" min="0" max="1" step="0.05" value="0.9">
+        <span id="topPVal">0.9</span>
+      </div>
+    </div>
+    <div class="config-row">
+      <div class="config-group" style="flex:1">
+        <label>📝 系统提示词</label>
+        <textarea id="systemPrompt" rows="2">你是一个有帮助的AI助手，能够用清晰、简洁的语言回答问题。</textarea>
+      </div>
+    </div>
+    <div class="config-row">
+      <div class="config-group" style="flex:1">
+        <label>📏 Max Tokens</label>
+        <input type="number" id="maxTokens" value="2048" min="1" max="32000">
+      </div>
     </div>
   </div>
 
-  <div class="prompt-area">
-    <div class="prompt-header">
-      <span>📝 系统提示词</span>
-      <button id="resetPromptBtn">恢复默认</button>
+  <!-- 长期记忆区域 -->
+  <div class="memory-section" id="memorySection">
+    <div class="memory-row">
+      <label style="font-size:0.7rem; white-space:nowrap;">🧠 长期记忆</label>
+      <textarea id="memoryText" placeholder="手动总结或自动生成…"></textarea>
+      <button id="saveMemoryBtn" style="font-size:0.65rem; padding:2px 8px;">保存</button>
+      <button id="clearMemoryBtn" style="font-size:0.65rem; padding:2px 8px;">清除</button>
+      <button id="autoSummaryBtn" style="font-size:0.65rem; padding:2px 8px;">🤖总结</button>
+      <label style="display:flex; align-items:center; gap:2px; font-size:0.65rem;">
+        <input type="checkbox" id="memoryToggle"> 开启
+      </label>
     </div>
-    <textarea id="systemPrompt">你是一名资深学术论文修改专家，擅长中英文论文的润色、逻辑优化和学术表达提升。请根据用户提供的论文段落进行修改，保持原意不变，提升语言流畅度、学术严谨性和结构清晰度。</textarea>
   </div>
 
+  <!-- 聊天区 -->
   <div class="chat-box" id="chatBox">
     <div class="message assistant">
       <div class="avatar">🤖</div>
-      <div class="bubble">你好！我是论文修改助手，可以直接把需要润色的段落粘贴过来。</div>
+      <div class="bubble">你好！你可以在这里自由对话。点击顶部「⚙️ 配置与参数」设置API和模型。</div>
     </div>
   </div>
 
+  <!-- 工具栏 -->
+  <div class="toolbar">
+    <button id="clearChatBtn">🗑️ 清空聊天</button>
+    <button id="deleteSelectedBtn">❌ 删除选中</button>
+    <button id="copyAllBtn">📋 复制全部</button>
+    <button id="toggleMemoryPanel" style="margin-left:auto;">🧠 记忆</button>
+  </div>
+
+  <!-- 输入区 -->
   <div class="input-row">
-    <textarea id="userInput" rows="1" placeholder="输入论文内容..."></textarea>
+    <textarea id="userInput" rows="1" placeholder="输入消息..."></textarea>
     <button id="sendBtn">发送</button>
   </div>
   <div class="status-bar" id="statusBar">⚡ 就绪</div>
@@ -267,123 +361,259 @@
 
 <script>
   (function() {
-    const apiBaseInput = document.getElementById('apiBase');
-    const apiKeyInput = document.getElementById('apiKey');
+    // DOM元素
+    const configToggle = document.getElementById('configToggle');
+    const configPanel = document.getElementById('configPanel');
+    const apiBase = document.getElementById('apiBase');
+    const apiKey = document.getElementById('apiKey');
     const modelSelect = document.getElementById('modelSelect');
     const fetchBtn = document.getElementById('fetchModelsBtn');
-    const systemPromptArea = document.getElementById('systemPrompt');
-    const resetPromptBtn = document.getElementById('resetPromptBtn');
+    const temperature = document.getElementById('temperature');
+    const tempVal = document.getElementById('tempVal');
+    const topP = document.getElementById('topP');
+    const topPVal = document.getElementById('topPVal');
+    const systemPrompt = document.getElementById('systemPrompt');
+    const maxTokens = document.getElementById('maxTokens');
     const chatBox = document.getElementById('chatBox');
     const userInput = document.getElementById('userInput');
     const sendBtn = document.getElementById('sendBtn');
     const statusBar = document.getElementById('statusBar');
+    const clearChatBtn = document.getElementById('clearChatBtn');
+    const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+    const copyAllBtn = document.getElementById('copyAllBtn');
+    const toggleMemoryPanel = document.getElementById('toggleMemoryPanel');
+    const memorySection = document.getElementById('memorySection');
+    const memoryText = document.getElementById('memoryText');
+    const saveMemoryBtn = document.getElementById('saveMemoryBtn');
+    const clearMemoryBtn = document.getElementById('clearMemoryBtn');
+    const autoSummaryBtn = document.getElementById('autoSummaryBtn');
+    const memoryToggle = document.getElementById('memoryToggle');
 
-    const DEFAULT_PROMPT = systemPromptArea.value;
-    let conversationHistory = [{ role: "system", content: DEFAULT_PROMPT }];
+    // 状态变量
+    let conversationHistory = [
+      { role: "system", content: systemPrompt.value }
+    ];
+    let memoryContent = '';
+    let memoryEnabled = memoryToggle.checked;
 
-    function setStatus(text, error = false) {
-      statusBar.textContent = text;
-      statusBar.style.color = error ? '#c0392b' : '#7c8b98';
-    }
+    // 配置折叠
+    configToggle.addEventListener('click', () => {
+      configPanel.classList.toggle('open');
+      configToggle.querySelector('span').textContent = configPanel.classList.contains('open') ? '▲' : '▼';
+    });
 
-    function appendMessage(role, content) {
-      const msg = document.createElement('div');
-      msg.className = `message ${role}`;
-      msg.innerHTML = `<div class="avatar">${role === 'user' ? '👤' : '🤖'}</div><div class="bubble">${escapeHtml(content)}</div>`;
-      chatBox.appendChild(msg);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
+    // 滑块同步
+    temperature.addEventListener('input', () => tempVal.textContent = temperature.value);
+    topP.addEventListener('input', () => topPVal.textContent = topP.value);
 
-    function appendLoading() {
-      const msg = document.createElement('div');
-      msg.className = 'message assistant';
-      msg.id = 'loadingMsg';
-      msg.innerHTML = `<div class="avatar">🤖</div><div class="bubble"><div class="loading-dots"><span></span><span></span><span></span></div></div>`;
-      chatBox.appendChild(msg);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    function removeLoading() {
-      const el = document.getElementById('loadingMsg');
-      if (el) el.remove();
-    }
-
-    function escapeHtml(text) {
-      return String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-
+    // 更新系统提示词
+    systemPrompt.addEventListener('input', updateSystemPrompt);
     function updateSystemPrompt() {
       if (conversationHistory[0]?.role === 'system') {
-        conversationHistory[0].content = systemPromptArea.value;
-      } else {
-        conversationHistory.unshift({ role: "system", content: systemPromptArea.value });
+        conversationHistory[0].content = systemPrompt.value;
       }
     }
-
-    systemPromptArea.addEventListener('input', updateSystemPrompt);
-    resetPromptBtn.addEventListener('click', () => {
-      systemPromptArea.value = DEFAULT_PROMPT;
-      updateSystemPrompt();
-      setStatus('已恢复默认提示词');
-    });
 
     // 拉取模型
     fetchBtn.addEventListener('click', async () => {
-      const base = apiBaseInput.value.trim().replace(/\/+$/, '');
-      const key = apiKeyInput.value.trim();
-      if (!key) {
-        setStatus('请先填写 API 密钥', true);
-        return;
-      }
-      setStatus('正在拉取模型...');
+      const base = apiBase.value.trim().replace(/\/+$/, '');
+      const key = apiKey.value.trim();
+      if (!key) { setStatus('缺少密钥', true); return; }
+      setStatus('拉取中...');
       fetchBtn.disabled = true;
       try {
-        const res = await fetch(`${base}/models`, {
-          headers: { 'Authorization': `Bearer ${key}` }
-        });
+        const res = await fetch(`${base}/models`, { headers: { 'Authorization': `Bearer ${key}` } });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         const models = data.data || [];
         modelSelect.innerHTML = '';
-        if (models.length === 0) {
-          modelSelect.innerHTML = '<option value="">无可用模型</option>';
-        } else {
-          models.forEach(m => {
-            const opt = document.createElement('option');
-            opt.value = m.id;
-            opt.textContent = m.id;
-            modelSelect.appendChild(opt);
-          });
-        }
+        models.forEach(m => {
+          const opt = document.createElement('option');
+          opt.value = m.id;
+          opt.textContent = m.id;
+          modelSelect.appendChild(opt);
+        });
         setStatus(`已加载 ${models.length} 个模型`);
       } catch(e) {
-        setStatus(`拉取失败: ${e.message}`, true);
+        setStatus('拉取失败: '+e.message, true);
       } finally {
         fetchBtn.disabled = false;
       }
     });
 
+    // 长期记忆 UI 切换
+    toggleMemoryPanel.addEventListener('click', () => {
+      memorySection.classList.toggle('active');
+    });
+    memoryToggle.addEventListener('change', () => {
+      memoryEnabled = memoryToggle.checked;
+      if (!memoryEnabled) memoryContent = ''; // 关闭时清空内存
+      else memoryContent = memoryText.value.trim();
+    });
+    saveMemoryBtn.addEventListener('click', () => {
+      memoryContent = memoryText.value.trim();
+      setStatus('记忆已保存');
+    });
+    clearMemoryBtn.addEventListener('click', () => {
+      memoryText.value = '';
+      memoryContent = '';
+      setStatus('记忆已清除');
+    });
+    autoSummaryBtn.addEventListener('click', async () => {
+      // 使用当前对话生成摘要
+      if (conversationHistory.length <= 1) {
+        setStatus('没有对话内容可总结', true);
+        return;
+      }
+      const base = apiBase.value.trim().replace(/\/+$/, '');
+      const key = apiKey.value.trim();
+      if (!key || !modelSelect.value) {
+        setStatus('请先配置API和模型', true);
+        return;
+      }
+      setStatus('正在生成摘要...');
+      autoSummaryBtn.disabled = true;
+      try {
+        const summaryPrompt = [
+          { role: "system", content: "请将以下对话内容总结为一段简短的摘要，保留关键信息和上下文。" },
+          ...conversationHistory.slice(1), // 跳过系统提示词
+          { role: "user", content: "请根据以上对话生成摘要。" }
+        ];
+        const res = await fetch(`${base}/chat/completions`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: modelSelect.value,
+            messages: summaryPrompt,
+            temperature: 0.3,
+            max_tokens: 500
+          })
+        });
+        if (!res.ok) throw new Error('请求失败');
+        const data = await res.json();
+        const summary = data.choices?.[0]?.message?.content || '';
+        memoryText.value = summary;
+        memoryContent = summary;
+        if (memoryEnabled) setStatus('摘要已生成并保存');
+        else setStatus('摘要已生成，请点击保存');
+      } catch(e) {
+        setStatus('总结失败: '+e.message, true);
+      } finally {
+        autoSummaryBtn.disabled = false;
+      }
+    });
+
+    // 构建消息列表（包含长期记忆）
+    function buildMessages(userMessage) {
+      const msgs = [];
+      // 系统提示词
+      if (systemPrompt.value.trim()) {
+        msgs.push({ role: "system", content: systemPrompt.value });
+      }
+      // 长期记忆
+      if (memoryEnabled && memoryContent) {
+        msgs.push({ role: "system", content: `[长期记忆]: ${memoryContent}` });
+      }
+      // 历史对话
+      const historyStart = conversationHistory[0]?.role === 'system' ? 1 : 0;
+      msgs.push(...conversationHistory.slice(historyStart));
+      if (userMessage) {
+        msgs.push({ role: "user", content: userMessage });
+      }
+      return msgs;
+    }
+
+    // 添加消息到界面
+    function appendMessage(role, content, index) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `message ${role}`;
+      msgDiv.dataset.index = index;
+      msgDiv.innerHTML = `
+        <div class="avatar">${role === 'user' ? '👤' : '🤖'}</div>
+        <div style="flex:1; display:flex; flex-direction:column;">
+          <div class="bubble">${escapeHtml(content)}</div>
+          <div class="msg-actions">
+            <label class="msg-btn"><input type="checkbox" class="select-checkbox">选</label>
+            <button class="msg-btn copy-btn">📋复制</button>
+            ${role === 'user' ? '<button class="msg-btn edit-btn">✏️编辑</button>' : ''}
+          </div>
+        </div>
+      `;
+      // 事件绑定
+      const checkbox = msgDiv.querySelector('.select-checkbox');
+      const copyBtn = msgDiv.querySelector('.copy-btn');
+      copyBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        navigator.clipboard.writeText(content).then(() => setStatus('已复制'));
+      });
+      if (role === 'user') {
+        const editBtn = msgDiv.querySelector('.edit-btn');
+        editBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          // 编辑：填入输入框，并删除该消息及之后的所有记录
+          const idx = parseInt(msgDiv.dataset.index);
+          editMessageAtIndex(idx, content);
+        });
+      }
+      chatBox.appendChild(msgDiv);
+    }
+
+    function editMessageAtIndex(index, oldContent) {
+      // 删除 index 及之后的所有消息
+      conversationHistory = conversationHistory.slice(0, index);
+      // 重新渲染聊天框
+      refreshChatBox();
+      // 填入内容到输入框
+      userInput.value = oldContent;
+      userInput.focus();
+      setStatus('已加载到输入框，修改后发送');
+    }
+
+    function refreshChatBox() {
+      chatBox.innerHTML = '';
+      // 重新显示所有消息（跳过系统提示词？展示历史消息，不包括系统提示词第一条）
+      const visibleMsgs = conversationHistory.slice(conversationHistory[0]?.role==='system' ? 1 : 0);
+      visibleMsgs.forEach((msg, i) => {
+        appendMessage(msg.role, msg.content, i + (conversationHistory[0]?.role==='system' ? 1 : 0));
+      });
+    }
+
+    // 添加加载动画
+    function appendLoading() {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message assistant';
+      msgDiv.id = 'loadingMsg';
+      msgDiv.innerHTML = `<div class="avatar">🤖</div><div class="bubble"><div class="loading-dots"><span></span><span></span><span></span></div></div>`;
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+    function removeLoading() {
+      document.getElementById('loadingMsg')?.remove();
+    }
+
     // 发送消息
     async function sendMessage() {
       const text = userInput.value.trim();
       if (!text) return;
-      const base = apiBaseInput.value.trim().replace(/\/+$/, '');
-      const key = apiKeyInput.value.trim();
+      const base = apiBase.value.trim().replace(/\/+$/, '');
+      const key = apiKey.value.trim();
       const model = modelSelect.value;
-      if (!key) { setStatus('缺少 API 密钥', true); return; }
-      if (!model) { setStatus('请选择模型', true); return; }
+      if (!key) { setStatus('缺少密钥', true); return; }
+      if (!model) { setStatus('未选择模型', true); return; }
 
-      updateSystemPrompt();
-      appendMessage('user', text);
-      conversationHistory.push({ role: "user", content: text });
+      // 添加用户消息到历史并显示
+      const userMsg = { role: "user", content: text };
+      conversationHistory.push(userMsg);
+      appendMessage('user', text, conversationHistory.length-1);
       userInput.value = '';
       userInput.style.height = 'auto';
 
       sendBtn.disabled = true;
       appendLoading();
-      setStatus('生成中...');
+      setStatus('思考中...');
 
       try {
+        const messages = buildMessages();
         const res = await fetch(`${base}/chat/completions`, {
           method: 'POST',
           headers: {
@@ -392,27 +622,32 @@
           },
           body: JSON.stringify({
             model: model,
-            messages: conversationHistory,
-            temperature: 0.7
+            messages: messages,
+            temperature: parseFloat(temperature.value),
+            top_p: parseFloat(topP.value),
+            max_tokens: parseInt(maxTokens.value) || 2048
           })
         });
         if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.error?.message || `请求失败 (${res.status})`);
+          const err = await res.json().catch(()=>({}));
+          throw new Error(err.error?.message || `HTTP ${res.status}`);
         }
         const data = await res.json();
         const reply = data.choices?.[0]?.message?.content || '(空回复)';
-        removeLoading();
-        appendMessage('assistant', reply);
         conversationHistory.push({ role: "assistant", content: reply });
+        removeLoading();
+        appendMessage('assistant', reply, conversationHistory.length-1);
         setStatus('就绪');
       } catch(e) {
         removeLoading();
-        appendMessage('assistant', `⚠️ ${e.message}`);
+        const errMsg = `错误: ${e.message}`;
+        conversationHistory.push({ role: "assistant", content: errMsg });
+        appendMessage('assistant', errMsg, conversationHistory.length-1);
         setStatus(e.message, true);
       } finally {
         sendBtn.disabled = false;
         userInput.focus();
+        chatBox.scrollTop = chatBox.scrollHeight;
       }
     }
 
@@ -428,7 +663,46 @@
       userInput.style.height = Math.min(userInput.scrollHeight, 100) + 'px';
     });
 
-    setStatus('就绪，点击「拉取模型」获取可用模型');
+    // 清空聊天
+    clearChatBtn.addEventListener('click', () => {
+      conversationHistory = systemPrompt.value ? [{ role: "system", content: systemPrompt.value }] : [];
+      refreshChatBox();
+      setStatus('聊天已清空');
+    });
+
+    // 删除选中
+    deleteSelectedBtn.addEventListener('click', () => {
+      const checkboxes = document.querySelectorAll('.select-checkbox:checked');
+      if (checkboxes.length === 0) return;
+      const indicesToDelete = Array.from(checkboxes).map(cb => {
+        return parseInt(cb.closest('.message').dataset.index);
+      }).sort((a,b)=>b-a); // 从后往前删
+      indicesToDelete.forEach(idx => {
+        conversationHistory.splice(idx, 1);
+      });
+      refreshChatBox();
+      setStatus(`已删除 ${indicesToDelete.length} 条消息`);
+    });
+
+    // 复制全部
+    copyAllBtn.addEventListener('click', () => {
+      const allText = conversationHistory
+        .filter(m => m.role !== 'system' || m.content === systemPrompt.value ? false : true) // 排除系统提示词
+        .map(m => `[${m.role}]: ${m.content}`).join('\n\n');
+      navigator.clipboard.writeText(allText).then(() => setStatus('已复制全部对话'));
+    });
+
+    function setStatus(text, error = false) {
+      statusBar.textContent = text;
+      statusBar.style.color = error ? '#c0392b' : '#7c8b98';
+    }
+
+    function escapeHtml(text) {
+      return String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // 初始状态
+    setStatus('就绪');
   })();
 </script>
 </body>
