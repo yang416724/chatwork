@@ -2,267 +2,267 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>论文修改助手 · 可配置 API</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>论文修改助手</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
     body {
-      font-family: 'Segoe UI', 'Noto Sans SC', system-ui, sans-serif;
+      font-family: 'Segoe UI', 'Noto Sans SC', system-ui, -apple-system, sans-serif;
       background: #f4f7fb;
       height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 12px;
+      padding: 8px;
+      touch-action: manipulation;
     }
     .container {
       width: 100%;
-      max-width: 850px;
-      height: 90vh;
-      background: #ffffff;
+      max-width: 600px;
+      height: 95vh;
+      background: #fff;
       border-radius: 20px;
-      box-shadow: 0 20px 40px rgba(0, 20, 40, 0.08);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
     .config-bar {
-      padding: 16px 20px;
+      padding: 12px 14px;
       background: #f9fbfd;
       border-bottom: 1px solid #e9edf2;
       display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .config-row {
+      display: flex;
+      gap: 8px;
       flex-wrap: wrap;
-      gap: 10px;
-      align-items: flex-end;
     }
     .config-group {
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      flex: 1 1 180px;
-      min-width: 140px;
+      gap: 2px;
+      flex: 1 1 0;
+      min-width: 0;
     }
     .config-group label {
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
       color: #5e6f7d;
+      letter-spacing: 0.3px;
     }
-    .config-group input,
-    .config-group select {
-      padding: 8px 12px;
+    .config-group input, .config-group select {
+      padding: 8px 10px;
       border: 1px solid #dce3ea;
       border-radius: 8px;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       background: #fff;
-      transition: 0.2s;
-      outline: none;
+      width: 100%;
     }
-    .config-group input:focus,
-    .config-group select:focus {
-      border-color: #2b7a62;
-      box-shadow: 0 0 0 2px rgba(43, 122, 98, 0.15);
+    .model-row {
+      display: flex;
+      gap: 6px;
+      align-items: flex-end;
+    }
+    .model-row .config-group {
+      flex: 1;
     }
     .fetch-btn {
       background: #2b7a62;
       color: white;
       border: none;
-      padding: 8px 18px;
+      padding: 8px 14px;
       border-radius: 8px;
       font-weight: 600;
-      font-size: 0.8rem;
-      cursor: pointer;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      height: 36px;
       display: flex;
       align-items: center;
-      gap: 5px;
-      transition: background 0.2s;
-      white-space: nowrap;
-      height: fit-content;
-      align-self: flex-end;
+      gap: 4px;
     }
-    .fetch-btn:hover { background: #1f5c4a; }
     .prompt-area {
-      padding: 12px 20px;
+      padding: 10px 14px;
       background: #f0f4f3;
       border-bottom: 1px solid #dcebe4;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
     }
     .prompt-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 5px;
     }
     .prompt-header span {
+      font-size: 0.75rem;
       font-weight: 600;
-      font-size: 0.8rem;
       color: #2b4b3a;
     }
     .prompt-header button {
       background: none;
       border: 1px solid #b7cdc2;
       color: #2b4b3a;
-      padding: 4px 12px;
+      padding: 3px 12px;
       border-radius: 20px;
-      font-size: 0.7rem;
-      cursor: pointer;
-      transition: 0.2s;
+      font-size: 0.65rem;
     }
-    .prompt-header button:hover { background: #dbe9e1; }
     textarea#systemPrompt {
       width: 100%;
       border: 1px solid #cbdcd3;
       border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 0.85rem;
-      font-family: inherit;
+      padding: 8px 10px;
+      font-size: 0.8rem;
       background: #fff;
       resize: vertical;
-      min-height: 60px;
-      max-height: 100px;
-      outline: none;
+      min-height: 55px;
+      max-height: 80px;
+      font-family: inherit;
     }
     .chat-box {
       flex: 1;
       overflow-y: auto;
-      padding: 16px 20px;
+      padding: 12px 14px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 10px;
       background: #ffffff;
     }
     .message {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       max-width: 90%;
-      animation: fadeIn 0.2s ease;
     }
-    .message.user { align-self: flex-end; flex-direction: row-reverse; }
-    .message.assistant { align-self: flex-start; }
+    .message.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+    .message.assistant {
+      align-self: flex-start;
+    }
     .avatar {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       background: #eef2f6;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1rem;
+      font-size: 0.9rem;
       flex-shrink: 0;
     }
     .message.user .avatar { background: #2b7a62; color: white; }
     .message.assistant .avatar { background: #f0dfce; color: #5e4630; }
     .bubble {
       background: #f1f4f9;
-      padding: 12px 15px;
-      border-radius: 16px;
-      font-size: 0.9rem;
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-size: 0.85rem;
       line-height: 1.5;
       white-space: pre-wrap;
       word-break: break-word;
-      color: #1a2b3c;
     }
     .message.user .bubble { background: #dff1eb; }
     .input-row {
-      padding: 14px 20px;
+      padding: 10px 14px;
       border-top: 1px solid #e9edf2;
       display: flex;
-      gap: 10px;
+      gap: 8px;
       background: #f9fbfd;
+      align-items: flex-end;
     }
     #userInput {
       flex: 1;
       border: 1px solid #dce3ea;
-      border-radius: 24px;
-      padding: 12px 18px;
-      font-size: 0.9rem;
+      border-radius: 20px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
       resize: none;
-      outline: none;
       font-family: inherit;
       background: #fff;
-      max-height: 120px;
+      max-height: 100px;
     }
     #sendBtn {
       background: #2b7a62;
       color: white;
       border: none;
-      border-radius: 24px;
-      padding: 0 24px;
+      border-radius: 20px;
+      padding: 10px 18px;
       font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
+      font-size: 0.85rem;
       white-space: nowrap;
     }
-    #sendBtn:hover { background: #1f5c4a; }
-    #sendBtn:disabled { background: #b7cdc2; cursor: not-allowed; }
-    .loading-dots { display: flex; gap: 4px; padding: 4px 0; }
+    #sendBtn:disabled { background: #b7cdc2; }
+    .loading-dots { display: flex; gap: 4px; padding: 2px 0; }
     .loading-dots span {
-      width: 6px; height: 6px;
+      width: 5px; height: 5px;
       background: #8795a1;
       border-radius: 50%;
-      animation: bounce 1.2s infinite ease-in-out;
+      animation: bounce 1.2s infinite;
     }
     .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
     .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
     @keyframes bounce {
-      0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+      0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; }
       40% { transform: scale(1.2); opacity: 1; }
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(5px); }
-      to { opacity: 1; transform: translateY(0); }
+    .status-bar {
+      font-size: 0.65rem;
+      color: #7c8b98;
+      padding: 6px 14px;
+      text-align: center;
     }
-    .status-text { font-size: 0.7rem; color: #5f6b7a; margin-left: 6px; }
   </style>
 </head>
 <body>
 <div class="container">
-  <!-- 配置栏：API 地址、密钥、模型选择 + 拉取按钮 -->
   <div class="config-bar">
-    <div class="config-group">
-      <label>🔗 API 地址</label>
-      <input type="text" id="apiBase" placeholder="https://api.openai.com/v1" value="https://api.openai.com/v1">
-    </div>
-    <div class="config-group">
-      <label>🔑 API 密钥</label>
-      <input type="password" id="apiKey" placeholder="sk-...">
-    </div>
-    <div class="config-group">
-      <label>🧠 模型</label>
-      <div style="display: flex; gap: 4px;">
-        <select id="modelSelect" style="flex:1;">
-          <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
-        </select>
-        <button class="fetch-btn" id="fetchModelsBtn" title="手动拉取该 API 商所有模型">📋 拉取模型</button>
+    <div class="config-row">
+      <div class="config-group">
+        <label>🔗 API 地址</label>
+        <input type="text" id="apiBase" placeholder="https://api.openai.com/v1" value="https://api.openai.com/v1">
+      </div>
+      <div class="config-group">
+        <label>🔑 API 密钥</label>
+        <input type="password" id="apiKey" placeholder="sk-...">
       </div>
     </div>
+    <div class="model-row">
+      <div class="config-group">
+        <label>🧠 模型</label>
+        <select id="modelSelect">
+          <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+        </select>
+      </div>
+      <button class="fetch-btn" id="fetchModelsBtn">📋 拉取模型</button>
+    </div>
   </div>
 
-  <!-- 系统提示词 -->
   <div class="prompt-area">
     <div class="prompt-header">
-      <span>📝 系统提示词（可修改）</span>
+      <span>📝 系统提示词</span>
       <button id="resetPromptBtn">恢复默认</button>
     </div>
-    <textarea id="systemPrompt">你是一名资深学术论文修改专家，擅长中英文论文的润色、逻辑优化和学术表达提升。请根据用户提供的论文段落进行修改，保持原意不变，提升语言流畅度、学术严谨性和结构清晰度。如果用户需要，可以给出修改说明。请使用礼貌专业的语气，直接输出润色后的内容，并在必要时用【修改说明】标注重要改动。</textarea>
+    <textarea id="systemPrompt">你是一名资深学术论文修改专家，擅长中英文论文的润色、逻辑优化和学术表达提升。请根据用户提供的论文段落进行修改，保持原意不变，提升语言流畅度、学术严谨性和结构清晰度。</textarea>
   </div>
 
-  <!-- 对话区 -->
   <div class="chat-box" id="chatBox">
     <div class="message assistant">
       <div class="avatar">🤖</div>
-      <div class="bubble">👋 你好！我是论文修改助手。请把需要修改的段落粘贴过来，我会帮你润色优化。</div>
+      <div class="bubble">你好！我是论文修改助手，可以直接把需要润色的段落粘贴过来。</div>
     </div>
   </div>
 
-  <!-- 输入区 -->
   <div class="input-row">
-    <textarea id="userInput" rows="1" placeholder="在此输入论文内容..."></textarea>
+    <textarea id="userInput" rows="1" placeholder="输入论文内容..."></textarea>
     <button id="sendBtn">发送</button>
   </div>
-  <div style="padding: 0 20px 8px; font-size:0.7rem; color:#7c8b98;" id="statusBar">⚡ 就绪</div>
+  <div class="status-bar" id="statusBar">⚡ 就绪</div>
 </div>
 
 <script>
@@ -270,7 +270,7 @@
     const apiBaseInput = document.getElementById('apiBase');
     const apiKeyInput = document.getElementById('apiKey');
     const modelSelect = document.getElementById('modelSelect');
-    const fetchModelsBtn = document.getElementById('fetchModelsBtn');
+    const fetchBtn = document.getElementById('fetchModelsBtn');
     const systemPromptArea = document.getElementById('systemPrompt');
     const resetPromptBtn = document.getElementById('resetPromptBtn');
     const chatBox = document.getElementById('chatBox');
@@ -279,709 +279,156 @@
     const statusBar = document.getElementById('statusBar');
 
     const DEFAULT_PROMPT = systemPromptArea.value;
+    let conversationHistory = [{ role: "system", content: DEFAULT_PROMPT }];
 
-    // 对话历史（系统提示词永远在第一位）
-    let conversationHistory = [{ role: "system", content: systemPromptArea.value }];
-
-    function setStatus(text, isError = false) {
+    function setStatus(text, error = false) {
       statusBar.textContent = text;
-      statusBar.style.color = isError ? '#c0392b' : '#7c8b98';
+      statusBar.style.color = error ? '#c0392b' : '#7c8b98';
     }
 
     function appendMessage(role, content) {
-      const msgDiv = document.createElement('div');
-      msgDiv.className = `message ${role}`;
-      const avatarIcon = role === 'user' ? '👤' : '🤖';
-      msgDiv.innerHTML = `<div class="avatar">${avatarIcon}</div><div class="bubble">${escapeHtml(content)}</div>`;
-      chatBox.appendChild(msgDiv);
+      const msg = document.createElement('div');
+      msg.className = `message ${role}`;
+      msg.innerHTML = `<div class="avatar">${role === 'user' ? '👤' : '🤖'}</div><div class="bubble">${escapeHtml(content)}</div>`;
+      chatBox.appendChild(msg);
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    function appendLoadingMessage() {
-      const msgDiv = document.createElement('div');
-      msgDiv.className = 'message assistant';
-      msgDiv.id = 'loadingMessage';
-      msgDiv.innerHTML = `<div class="avatar">🤖</div><div class="bubble"><div class="loading-dots"><span></span><span></span><span></span></div></div>`;
-      chatBox.appendChild(msgDiv);
+    function appendLoading() {
+      const msg = document.createElement('div');
+      msg.className = 'message assistant';
+      msg.id = 'loadingMsg';
+      msg.innerHTML = `<div class="avatar">🤖</div><div class="bubble"><div class="loading-dots"><span></span><span></span><span></span></div></div>`;
+      chatBox.appendChild(msg);
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    function removeLoadingMessage() {
-      const loading = document.getElementById('loadingMessage');
-      if (loading) loading.remove();
+    function removeLoading() {
+      const el = document.getElementById('loadingMsg');
+      if (el) el.remove();
     }
 
     function escapeHtml(text) {
-      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+      return String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
-    function updateSystemPromptInHistory() {
-      if (conversationHistory.length > 0 && conversationHistory[0].role === 'system') {
+    function updateSystemPrompt() {
+      if (conversationHistory[0]?.role === 'system') {
         conversationHistory[0].content = systemPromptArea.value;
       } else {
         conversationHistory.unshift({ role: "system", content: systemPromptArea.value });
       }
     }
 
-    systemPromptArea.addEventListener('input', updateSystemPromptInHistory);
-
+    systemPromptArea.addEventListener('input', updateSystemPrompt);
     resetPromptBtn.addEventListener('click', () => {
       systemPromptArea.value = DEFAULT_PROMPT;
-      updateSystemPromptInHistory();
-      setStatus('✅ 已恢复默认提示词');
+      updateSystemPrompt();
+      setStatus('已恢复默认提示词');
     });
 
-    // 手动拉取模型列表
-    fetchModelsBtn.addEventListener('click', async () => {
-      const baseUrl = apiBaseInput.value.trim().replace(/\/+$/, '');
-      const apiKey = apiKeyInput.value.trim();
-      if (!apiKey) {
-        setStatus('❌ 请先填写 API 密钥', true);
+    // 拉取模型
+    fetchBtn.addEventListener('click', async () => {
+      const base = apiBaseInput.value.trim().replace(/\/+$/, '');
+      const key = apiKeyInput.value.trim();
+      if (!key) {
+        setStatus('请先填写 API 密钥', true);
         return;
       }
-      setStatus('🔄 正在拉取模型列表...');
-      fetchModelsBtn.disabled = true;
+      setStatus('正在拉取模型...');
+      fetchBtn.disabled = true;
       try {
-        const response = await fetch(`${baseUrl}/models`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json'
-          }
+        const res = await fetch(`${base}/models`, {
+          headers: { 'Authorization': `Bearer ${key}` }
         });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data = await response.json();
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
         const models = data.data || [];
         modelSelect.innerHTML = '';
         if (models.length === 0) {
           modelSelect.innerHTML = '<option value="">无可用模型</option>';
-          setStatus('⚠️ 模型列表为空', true);
         } else {
           models.forEach(m => {
-            const option = document.createElement('option');
-            option.value = m.id;
-            option.textContent = m.id;
-            modelSelect.appendChild(option);
+            const opt = document.createElement('option');
+            opt.value = m.id;
+            opt.textContent = m.id;
+            modelSelect.appendChild(opt);
           });
-          setStatus(`✅ 成功拉取 ${models.length} 个模型`);
         }
-      } catch (err) {
-        setStatus(`❌ 拉取失败: ${err.message}`, true);
-        console.error(err);
+        setStatus(`已加载 ${models.length} 个模型`);
+      } catch(e) {
+        setStatus(`拉取失败: ${e.message}`, true);
       } finally {
-        fetchModelsBtn.disabled = false;
-      }
-    });
-
-    async function sendMessage() {
-      const userText = userInput.value.trim();
-      if (!userText) return;
-      const baseUrl = apiBaseInput.value.trim().replace(/\/+$/, '');
-      const apiKey = apiKeyInput.value.trim();
-      const model = modelSelect.value;
-      if (!apiKey) { setStatus('❌ 请填写 API 密钥', true); return; }
-      if (!model) { setStatus('❌ 请选择一个模型', true); return; }
-
-      updateSystemPromptInHistory();
-      appendMessage('user', userText);
-      conversationHistory.push({ role: "user", content: userText });
-      userInput.value = '';
-      userInput.style.height = 'auto';
-
-      sendBtn.disabled = true;
-      appendLoadingMessage();
-      setStatus('⏳ 正在生成回复...');
-
-      try {
-        const response = await fetch(`${baseUrl}/chat/completions`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            model: model,
-            messages: conversationHistory,
-            temperature: 0.7,
-            stream: false
-          })
-        });
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.error?.message || `请求失败 (${response.status})`);
-        }
-        const data = await response.json();
-        const assistantContent = data.choices?.[0]?.message?.content || '（无回复内容）';
-        removeLoadingMessage();
-        appendMessage('assistant', assistantContent);
-        conversationHistory.push({ role: "assistant", content: assistantContent });
-        setStatus('✅ 就绪');
-      } catch (err) {
-        removeLoadingMessage();
-        appendMessage('assistant', `⚠️ 错误: ${err.message}`);
-        setStatus(`❌ ${err.message}`, true);
-        console.error(err);
-      } finally {
-        sendBtn.disabled = false;
-        userInput.focus();
-      }
-    }
-
-    sendBtn.addEventListener('click', sendMessage);
-    userInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
-      }
-    });
-    userInput.addEventListener('input', () => {
-      userInput.style.height = 'auto';
-      userInput.style.height = Math.min(userInput.scrollHeight, 120) + 'px';
-    });
-
-    setStatus('⚡ 就绪，请填写密钥后点击 📋 拉取模型');
-  })();
-</script>
-</body>
-</html>    .config-bar {
-      padding: 16px 20px;
-      background: #f9fbfd;
-      border-bottom: 1px solid #e9edf2;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: flex-end;
-    }
-
-    .config-group {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      flex: 1 1 180px;
-      min-width: 140px;
-    }
-
-    .config-group label {
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #5e6f7d;
-    }
-
-    .config-group input,
-    .config-group select {
-      padding: 8px 12px;
-      border: 1px solid #dce3ea;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      background: #fff;
-      transition: 0.2s;
-      outline: none;
-    }
-
-    .config-group input:focus,
-    .config-group select:focus {
-      border-color: #2b7a62;
-      box-shadow: 0 0 0 2px rgba(43, 122, 98, 0.15);
-    }
-
-    .fetch-btn {
-      background: #2b7a62;
-      color: white;
-      border: none;
-      padding: 8px 18px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 0.8rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      transition: background 0.2s;
-      white-space: nowrap;
-      height: fit-content;
-      align-self: flex-end;
-    }
-
-    .fetch-btn:hover {
-      background: #1f5c4a;
-    }
-
-    /* 系统提示词 */
-    .prompt-area {
-      padding: 12px 20px;
-      background: #f0f4f3;
-      border-bottom: 1px solid #dcebe4;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .prompt-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .prompt-header span {
-      font-weight: 600;
-      font-size: 0.8rem;
-      color: #2b4b3a;
-    }
-
-    .prompt-header button {
-      background: none;
-      border: 1px solid #b7cdc2;
-      color: #2b4b3a;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.7rem;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .prompt-header button:hover {
-      background: #dbe9e1;
-    }
-
-    textarea#systemPrompt {
-      width: 100%;
-      border: 1px solid #cbdcd3;
-      border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 0.85rem;
-      font-family: inherit;
-      background: #fff;
-      resize: vertical;
-      min-height: 60px;
-      max-height: 100px;
-      outline: none;
-    }
-
-    /* 对话区域 */
-    .chat-box {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      background: #ffffff;
-    }
-
-    .message {
-      display: flex;
-      gap: 8px;
-      max-width: 90%;
-      animation: fadeIn 0.2s ease;
-    }
-
-    .message.user {
-      align-self: flex-end;
-      flex-direction: row-reverse;
-    }
-
-    .message.assistant {
-      align-self: flex-start;
-    }
-
-    .avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: #eef2f6;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      flex-shrink: 0;
-    }
-
-    .message.user .avatar {
-      background: #2b7a62;
-      color: white;
-    }
-
-    .message.assistant .avatar {
-      background: #f0dfce;
-      color: #5e4630;
-    }
-
-    .bubble {
-      background: #f1f4f9;
-      padding: 12px 15px;
-      border-radius: 16px;
-      font-size: 0.9rem;
-      line-height: 1.5;
-      white-space: pre-wrap;
-      word-break: break-word;
-      color: #1a2b3c;
-    }
-
-    .message.user .bubble {
-      background: #dff1eb;
-    }
-
-    /* 输入区域 */
-    .input-row {
-      padding: 14px 20px;
-      border-top: 1px solid #e9edf2;
-      display: flex;
-      gap: 10px;
-      background: #f9fbfd;
-    }
-
-    #userInput {
-      flex: 1;
-      border: 1px solid #dce3ea;
-      border-radius: 24px;
-      padding: 12px 18px;
-      font-size: 0.9rem;
-      resize: none;
-      outline: none;
-      font-family: inherit;
-      background: #fff;
-      max-height: 120px;
-    }
-
-    #sendBtn {
-      background: #2b7a62;
-      color: white;
-      border: none;
-      border-radius: 24px;
-      padding: 0 24px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
-      white-space: nowrap;
-    }
-
-    #sendBtn:hover {
-      background: #1f5c4a;
-    }
-
-    #sendBtn:disabled {
-      background: #b7cdc2;
-      cursor: not-allowed;
-    }
-
-    .loading-dots {
-      display: flex;
-      gap: 4px;
-      padding: 4px 0;
-    }
-
-    .loading-dots span {
-      width: 6px;
-      height: 6px;
-      background: #8795a1;
-      border-radius: 50%;
-      animation: bounce 1.2s infinite ease-in-out;
-    }
-
-    .loading-dots span:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-
-    .loading-dots span:nth-child(3) {
-      animation-delay: 0.4s;
-    }
-
-    @keyframes bounce {
-      0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
-      40% { transform: scale(1.2); opacity: 1; }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(5px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .status-text {
-      font-size: 0.7rem;
-      color: #5f6b7a;
-      margin-left: 6px;
-    }
-  </style>
-</head>
-<body>
-<div class="container">
-  <!-- 配置栏 -->
-  <div class="config-bar">
-    <div class="config-group">
-      <label>🔗 API 地址</label>
-      <input type="text" id="apiBase" placeholder="https://api.openai.com/v1" value="https://api.openai.com/v1">
-    </div>
-    <div class="config-group">
-      <label>🔑 API 密钥</label>
-      <input type="password" id="apiKey" placeholder="sk-...">
-    </div>
-    <div class="config-group">
-      <label>🧠 模型</label>
-      <div style="display: flex; gap: 4px;">
-        <select id="modelSelect" style="flex:1;">
-          <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
-        </select>
-        <button class="fetch-btn" id="fetchModelsBtn" title="获取模型列表">📋</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 系统提示词 -->
-  <div class="prompt-area">
-    <div class="prompt-header">
-      <span>📝 系统提示词（可修改）</span>
-      <button id="resetPromptBtn">恢复默认</button>
-    </div>
-    <textarea id="systemPrompt">你是一名资深学术论文修改专家，擅长中英文论文的润色、逻辑优化和学术表达提升。请根据用户提供的论文段落进行修改，保持原意不变，提升语言流畅度、学术严谨性和结构清晰度。如果用户需要，可以给出修改说明。请使用礼貌专业的语气，直接输出润色后的内容，并在必要时用【修改说明】标注重要改动。</textarea>
-  </div>
-
-  <!-- 对话区 -->
-  <div class="chat-box" id="chatBox">
-    <div class="message assistant">
-      <div class="avatar">🤖</div>
-      <div class="bubble">👋 你好！我是论文修改助手。请把需要修改的段落粘贴过来，我会帮你润色优化。</div>
-    </div>
-  </div>
-
-  <!-- 输入区 -->
-  <div class="input-row">
-    <textarea id="userInput" rows="1" placeholder="在此输入论文内容..."></textarea>
-    <button id="sendBtn">发送</button>
-  </div>
-  <div style="padding: 0 20px 8px; font-size:0.7rem; color:#7c8b98;" id="statusBar">⚡ 就绪</div>
-</div>
-
-<script>
-  (function() {
-    // DOM 元素
-    const apiBaseInput = document.getElementById('apiBase');
-    const apiKeyInput = document.getElementById('apiKey');
-    const modelSelect = document.getElementById('modelSelect');
-    const fetchModelsBtn = document.getElementById('fetchModelsBtn');
-    const systemPromptArea = document.getElementById('systemPrompt');
-    const resetPromptBtn = document.getElementById('resetPromptBtn');
-    const chatBox = document.getElementById('chatBox');
-    const userInput = document.getElementById('userInput');
-    const sendBtn = document.getElementById('sendBtn');
-    const statusBar = document.getElementById('statusBar');
-
-    // 默认提示词
-    const DEFAULT_PROMPT = systemPromptArea.value;
-
-    // 对话历史（只保留当前会话的上下文）
-    let conversationHistory = [
-      { role: "system", content: systemPromptArea.value }
-    ];
-
-    // 辅助函数：更新状态
-    function setStatus(text, isError = false) {
-      statusBar.textContent = text;
-      statusBar.style.color = isError ? '#c0392b' : '#7c8b98';
-    }
-
-    // 添加消息到聊天框
-    function appendMessage(role, content) {
-      const msgDiv = document.createElement('div');
-      msgDiv.className = `message ${role}`;
-      const avatarIcon = role === 'user' ? '👤' : '🤖';
-      msgDiv.innerHTML = `
-        <div class="avatar">${avatarIcon}</div>
-        <div class="bubble">${escapeHtml(content)}</div>
-      `;
-      chatBox.appendChild(msgDiv);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    // 添加加载动画（助手占位）
-    function appendLoadingMessage() {
-      const msgDiv = document.createElement('div');
-      msgDiv.className = 'message assistant';
-      msgDiv.id = 'loadingMessage';
-      msgDiv.innerHTML = `
-        <div class="avatar">🤖</div>
-        <div class="bubble">
-          <div class="loading-dots">
-            <span></span><span></span><span></span>
-          </div>
-        </div>
-      `;
-      chatBox.appendChild(msgDiv);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    function removeLoadingMessage() {
-      const loading = document.getElementById('loadingMessage');
-      if (loading) loading.remove();
-    }
-
-    // 简单转义防止XSS
-    function escapeHtml(text) {
-      return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-    // 更新系统提示词到对话历史
-    function updateSystemPromptInHistory() {
-      if (conversationHistory.length > 0 && conversationHistory[0].role === 'system') {
-        conversationHistory[0].content = systemPromptArea.value;
-      } else {
-        conversationHistory.unshift({ role: "system", content: systemPromptArea.value });
-      }
-    }
-
-    // 监听提示词修改
-    systemPromptArea.addEventListener('input', () => {
-      updateSystemPromptInHistory();
-    });
-
-    // 重置提示词
-    resetPromptBtn.addEventListener('click', () => {
-      systemPromptArea.value = DEFAULT_PROMPT;
-      updateSystemPromptInHistory();
-      setStatus('✅ 已恢复默认提示词');
-    });
-
-    // 获取模型列表
-    fetchModelsBtn.addEventListener('click', async () => {
-      const baseUrl = apiBaseInput.value.trim().replace(/\/+$/, '');
-      const apiKey = apiKeyInput.value.trim();
-      if (!apiKey) {
-        setStatus('❌ 请先填写 API 密钥', true);
-        return;
-      }
-      setStatus('🔄 正在获取模型列表...');
-      fetchModelsBtn.disabled = true;
-      try {
-        const response = await fetch(`${baseUrl}/models`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-        const data = await response.json();
-        const models = data.data || [];
-        // 清空并填充下拉框
-        modelSelect.innerHTML = '';
-        if (models.length === 0) {
-          modelSelect.innerHTML = '<option value="">无可用模型</option>';
-          setStatus('⚠️ 模型列表为空', true);
-        } else {
-          models.forEach(m => {
-            const option = document.createElement('option');
-            option.value = m.id;
-            option.textContent = m.id;
-            modelSelect.appendChild(option);
-          });
-          setStatus(`✅ 加载了 ${models.length} 个模型`);
-        }
-      } catch (err) {
-        setStatus(`❌ 获取模型失败: ${err.message}`, true);
-        console.error(err);
-      } finally {
-        fetchModelsBtn.disabled = false;
+        fetchBtn.disabled = false;
       }
     });
 
     // 发送消息
     async function sendMessage() {
-      const userText = userInput.value.trim();
-      if (!userText) return;
-
-      const baseUrl = apiBaseInput.value.trim().replace(/\/+$/, '');
-      const apiKey = apiKeyInput.value.trim();
+      const text = userInput.value.trim();
+      if (!text) return;
+      const base = apiBaseInput.value.trim().replace(/\/+$/, '');
+      const key = apiKeyInput.value.trim();
       const model = modelSelect.value;
+      if (!key) { setStatus('缺少 API 密钥', true); return; }
+      if (!model) { setStatus('请选择模型', true); return; }
 
-      if (!apiKey) {
-        setStatus('❌ 请填写 API 密钥', true);
-        return;
-      }
-      if (!model) {
-        setStatus('❌ 请选择一个模型', true);
-        return;
-      }
-
-      // 确保系统提示词最新
-      updateSystemPromptInHistory();
-
-      // 添加用户消息到界面和历史
-      appendMessage('user', userText);
-      conversationHistory.push({ role: "user", content: userText });
+      updateSystemPrompt();
+      appendMessage('user', text);
+      conversationHistory.push({ role: "user", content: text });
       userInput.value = '';
       userInput.style.height = 'auto';
 
-      // 禁用发送，显示加载
       sendBtn.disabled = true;
-      appendLoadingMessage();
-      setStatus('⏳ 正在生成回复...');
+      appendLoading();
+      setStatus('生成中...');
 
       try {
-        const response = await fetch(`${baseUrl}/chat/completions`, {
+        const res = await fetch(`${base}/chat/completions`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${apiKey}`,
+            'Authorization': `Bearer ${key}`,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             model: model,
             messages: conversationHistory,
-            temperature: 0.7,
-            stream: false
+            temperature: 0.7
           })
         });
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.error?.message || `请求失败 (${response.status})`);
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error?.message || `请求失败 (${res.status})`);
         }
-
-        const data = await response.json();
-        const assistantContent = data.choices?.[0]?.message?.content || '（无回复内容）';
-
-        // 移除加载动画，添加助手消息
-        removeLoadingMessage();
-        appendMessage('assistant', assistantContent);
-        conversationHistory.push({ role: "assistant", content: assistantContent });
-        setStatus('✅ 就绪');
-      } catch (err) {
-        removeLoadingMessage();
-        appendMessage('assistant', `⚠️ 错误: ${err.message}`);
-        setStatus(`❌ ${err.message}`, true);
-        console.error(err);
+        const data = await res.json();
+        const reply = data.choices?.[0]?.message?.content || '(空回复)';
+        removeLoading();
+        appendMessage('assistant', reply);
+        conversationHistory.push({ role: "assistant", content: reply });
+        setStatus('就绪');
+      } catch(e) {
+        removeLoading();
+        appendMessage('assistant', `⚠️ ${e.message}`);
+        setStatus(e.message, true);
       } finally {
         sendBtn.disabled = false;
         userInput.focus();
       }
     }
 
-    // 发送按钮事件
     sendBtn.addEventListener('click', sendMessage);
-
-    // 回车发送（Shift+Enter 换行）
     userInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         sendMessage();
       }
     });
-
-    // 自动调整输入框高度
     userInput.addEventListener('input', () => {
       userInput.style.height = 'auto';
-      userInput.style.height = Math.min(userInput.scrollHeight, 120) + 'px';
+      userInput.style.height = Math.min(userInput.scrollHeight, 100) + 'px';
     });
 
-    // 初始状态
-    setStatus('⚡ 就绪，请配置 API 密钥和模型');
+    setStatus('就绪，点击「拉取模型」获取可用模型');
   })();
 </script>
 </body>
